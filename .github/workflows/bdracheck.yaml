@@ -1,0 +1,36 @@
+name: BDRA-Lite Architecture Compliance Guard
+
+on:
+  push:
+    branches: [ "main", "master" ]
+  pull_request:
+    branches: [ "main", "master" ]
+
+jobs:
+  compliance-matrix:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 📥 Checkout Source Code
+      uses: actions/checkout@v4
+
+    - name: 🐍 Initialize Python Runtime Environment
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.12"
+        cache: "pip" # Automatically speed up subsequent workflow runs
+
+    - name: 📦 Install Architecture Dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install fastapi uvicorn aiosqlite click mypy pydantic pytest pytest-archon
+
+    - name: 🔬 Execute Static Compilation Gate (Mypy Strict)
+      run: |
+        python -m mypy app bdracheck.py
+
+    - name: 🧪 Execute Automated Architecture Guardrail Tests
+      run: |
+        python -m pytest tests/ -v
+
+        

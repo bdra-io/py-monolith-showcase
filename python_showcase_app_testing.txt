@@ -1,0 +1,61 @@
+setup environment
+.\venv\Scripts\Activate.ps1
+
+make sure the code complies with project's static type constraints
+.\venv\Scripts\python.exe -m mypy app
+
+Step 1: Execute the Zero-Mock Test Suite
+pytest -v
+
+Step 2: Boot up the Modular Monolith
+uvicorn app.main:app --reload --port 8080
+
+Step 3: Simulate the Live Resiliency Lifecycle
+
+Phase A: Stable Processing (Normal Conditions)
+Invoke-RestMethod -Uri "http://127.0.0.1:8080/orders" -Method Post -Headers @{"X-Tenant-ID"="tenant_alpha"} -ContentType "application/json" -Body '{"user_id": "usr_admin01", "amount": 250.00}'
+
+Phase B: Triggering an Infrastructure Outage
+Invoke-RestMethod -Uri "http://127.0.0.1:8080/simulate/db-outage" -Method Get
+
+Phase C: Verifying Tier 3 Write-Rejection
+Invoke-RestMethod -Uri "http://127.0.0.1:8080/orders" -Method Post -Headers @{"X-Tenant-ID"="tenant_alpha"} -ContentType "application/json" -Body '{"user_id": "usr_admin01", "amount": 99.00}'
+
+Phase D: Verifying Tier 2 Transparent Cached Reads
+Invoke-RestMethod -Uri "http://127.0.0.1:8080/orders/ord_abc123" -Method Get -Headers @{"X-Tenant-ID"="tenant_alpha"}
+
+(Replace ord_abc123 with the real ID returned during your Phase A request).
+
+Phase E: Self-Healing System Recovery
+Invoke-RestMethod -Uri "http://127.0.0.1:8080/simulate/db-recovery" -Method Get
+
+
+Step 4: Verify with Architecture Governance
+& "$env:USERPROFILE\go\bin\bdracheck.exe" verify
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+3. Strict Production Containerization (Multi-Stage Dockerfiles)
+To make this deployable to a modern cloud-native Kubernetes environment, you need a bulletproof container strategy.
+
+The Upgrade: We can engineer a multi-stage, production-grade Dockerfile.
+
+The Value: The first stage pulls your dev dependencies, runs mypy app, and executes pytest. If either tool drops a single error, the Docker build fails. The second stage discards all development cruft, copies over only the validated source code, and uses a minimal, non-root alpine image to guarantee security and lightning-fast deployment times.
+
+🛠️ 4. Expand the CLI with Automated Tenant Provisioning
+Since you already have bdracheck up and running, we can make it a centerpiece of your developer experience.
+
+The Upgrade: Add a bdracheck create-tenant <tenant_id> command.
+
+The Value: This would automatically initialize isolated schema spaces, seed dummy data for that explicit tenant profile, and issue cryptographically secure workspace authorization tokens for local testing.

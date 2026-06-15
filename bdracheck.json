@@ -1,0 +1,21 @@
+{
+  "$schema": "https://raw.githubusercontent.com/bdra-io/bdra-spec/main/schemas/v1/linter.json",
+  "projectName": "py-monolith-showcase",
+  "architectureStrategy": "BDRA-Lite",
+  "rules": {
+    "disallowExternalImportsInPure": {
+      "targetDirs": ["app/internal/ring*/pure/**/*.py"]
+    },
+    "disallowIOInProtected": {
+      "targetDirs": ["app/internal/ring*/protected/**/*.py"],
+      "forbiddenPackages": ["fastapi", "uvicorn", "httpx", "os", "sys"]
+    },
+    "enforceInwardDependencyFlow": {
+      "rings": [
+        { "id": "ring0", "path": "app/internal/ring0" },
+        { "id": "ring1", "path": "app/internal/ring1", "allowedDependencies": ["ring0"] },
+        { "id": "ring2", "path": "app/internal/ring2", "allowedDependencies": ["ring0", "ring1"] }
+      ]
+    }
+  }
+}

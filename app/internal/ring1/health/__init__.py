@@ -1,0 +1,1 @@
+# Initializer for Ring 1 Transactional Core elements

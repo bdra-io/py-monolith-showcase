@@ -1,0 +1,1 @@
+# Encapsulates internal ring modules cleanly from external visibility boundaries
